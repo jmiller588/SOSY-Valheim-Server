@@ -1,3 +1,4 @@
+
 $ErrorActionPreference = "Stop"
 
 $profileFile = Join-Path $PSScriptRoot "SOSY-1.0.r2z"
@@ -24,44 +25,75 @@ if ($steamKey -and $steamKey.SteamPath) {
     $steamPath = $steamKey.SteamPath
 }
 
+$valheimPath = $null
+
 if (-not $steamPath) {
     Write-Host "Steam was not detected." -ForegroundColor Red
     Write-Host "Opening the Steam download page..."
     Start-Process "https://store.steampowered.com/about/"
 } else {
     Write-Host "Steam found: $steamPath" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Checking Steam libraries..." -ForegroundColor Yellow
 
-    $valheimFound = $false
-    $libraryFiles = @(
-        (Join-Path $steamPath "steamapps\libraryfolders.vdf")
-    )
+    $libraryPaths = @($steamPath)
 
-    foreach ($libraryFile in $libraryFiles) {
-        if (Test-Path $libraryFile) {
-            $content = Get-Content $libraryFile -Raw
-            $paths = [regex]::Matches($content, '"path"\s+"([^"]+)"')
+    $libraryFile = Join-Path $steamPath "steamapps\libraryfolders.vdf"
 
-            foreach ($match in $paths) {
-                $libraryPath = $match.Groups[1].Value -replace '\\\\','\'
-                $manifest = Join-Path $libraryPath "steamapps\appmanifest_892970.acf"
+    if (Test-Path $libraryFile) {
+        try {
+            $content = Get-Content $libraryFile -Raw -ErrorAction Stop
+            $matches = [regex]::Matches($content, '"path"\s+"([^"]+)"')
 
-                if (Test-Path $manifest) {
-                    $valheimFound = $true
-                    break
+            foreach ($match in $matches) {
+                $path = $match.Groups[1].Value -replace '\\\\','\'
+
+                if ($path -and $libraryPaths -notcontains $path) {
+                    $libraryPaths += $path
                 }
+            }
+        } catch {
+            Write-Host "WARNING: Could not read Steam library configuration." -ForegroundColor Yellow
+        }
+    }
+
+    foreach ($library in $libraryPaths) {
+        Write-Host "  $library"
+
+        $manifest = Join-Path $library "steamapps\appmanifest_892970.acf"
+
+        if (Test-Path $manifest) {
+            try {
+                $manifestContent = Get-Content $manifest -Raw -ErrorAction Stop
+                $installDirMatch = [regex]::Match(
+                    $manifestContent,
+                    '"installdir"\s+"([^"]+)"'
+                )
+
+                if ($installDirMatch.Success) {
+                    $installDir = $installDirMatch.Groups[1].Value
+                    $candidatePath = Join-Path $library "steamapps\common\$installDir"
+                    $executable = Join-Path $candidatePath "valheim.exe"
+
+                    if (Test-Path $executable) {
+                        $valheimPath = $candidatePath
+                        break
+                    }
+                }
+            } catch {
+                Write-Host "    WARNING: Could not verify this installation." -ForegroundColor Yellow
             }
         }
     }
 
-    $defaultManifest = Join-Path $steamPath "steamapps\appmanifest_892970.acf"
-    if (Test-Path $defaultManifest) {
-        $valheimFound = $true
-    }
+    Write-Host ""
 
-    if ($valheimFound) {
-        Write-Host "Valheim found in a Steam library." -ForegroundColor Green
+    if ($valheimPath) {
+        Write-Host "Valheim found!" -ForegroundColor Green
+        Write-Host "Game location: $valheimPath" -ForegroundColor Green
     } else {
-        Write-Host "Valheim was not detected. Make sure it is installed through Steam." -ForegroundColor Yellow
+        Write-Host "Valheim was not detected." -ForegroundColor Yellow
+        Write-Host "Make sure Valheim is installed through Steam."
     }
 }
 
