@@ -1,3 +1,4 @@
+
 # SOSY 1.0 - Valheim Dedicated Server
 
 Welcome to SOSY 1.0! This repository contains the modpack profile and installer for our private Valheim dedicated server.
@@ -12,14 +13,16 @@ Welcome to SOSY 1.0! This repository contains the modpack profile and installer 
 
 ### Installation
 
-1. Visit the [Latest Release](https://github.com/jmiller588/SOSY-Valheim-Server-Copy/releases/latest).
+1. Visit the [Latest Release](https://github.com/jmiller588/SOSY-Valheim-Server/releases/latest).
 2. Download `SOSY-1.0-Installer.zip`.
 3. Extract the ZIP file.
-4. Run `Install-SOSY.ps1`.
+4. Double-click `Install-SOSY.bat`.
 5. Follow the instructions to import the SOSY 1.0 profile into r2modman.
 6. Launch Valheim using **Start modded** in r2modman.
 
 The first launch may take a few minutes while the mods download.
+
+No manual PowerShell configuration is required. The batch launcher starts the installer with a temporary execution-policy bypass.
 
 ## Included Mods
 
@@ -33,7 +36,8 @@ The first launch may take a few minutes while the mods download.
 
 ## Server Connection
 
-**Server:** `valheim.millerhomedomain.com`  
+**Server:** `valheim.millerhomedomain.com`
+
 **Port:** `2456`
 
 Connect using Valheim's **Join IP** option.

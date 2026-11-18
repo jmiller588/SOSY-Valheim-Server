@@ -5,15 +5,17 @@ Welcome to SOSY 1.0!
 
 REQUIREMENTS
 ------------
+
 - Valheim installed through Steam
 - r2modman installed
+- Windows 10 or Windows 11
 - An internet connection
 
 INSTALLATION
 ------------
 
 1. Extract the entire SOSY-Installer folder.
-2. Run Install-SOSY.ps1.
+2. Double-click Install-SOSY.bat.
 3. Follow the instructions displayed by the installer.
 4. In r2modman, select Valheim.
 5. Import the local profile using SOSY-1.0.r2z.
@@ -39,6 +41,7 @@ valheim.millerhomedomain.com:2456
 
 IMPORTANT
 ---------
+
 Always launch Valheim using Start modded in r2modman.
 Launching directly through Steam will not load the mods.
 
@@ -48,6 +51,7 @@ mod versions.
 
 MODS INCLUDED
 -------------
+
 - BepInExPack
 - Jotunn
 - Equipment and Quick Slots
